@@ -1,0 +1,13 @@
+#不要删除前面注释的四行
+#配置文件字段依次为：Server类型 Domain名称	Domain端口 Domain模式 Server端口 Server内存大小 yes 七个字段
+#示例1：admin   clubdomain	7001 dev 7001 512  yes
+#示例2：manage	clubdomain	7001 dev 7002 2048 yes
+admin   timerdomain	8011 prod 8011 1024  yes
+admin   clubwebdomain	8012 prod 8012 1024  yes
+admin   intsdomain	8013 prod 8013 1024  yes
+admin   crmwebdomain	8014 prod 8014 1024  yes
+admin   merchantdomain	8015 prod 8015 1024  yes
+admin   picsdomain	8016 prod 8016 1024  yes
+admin   cbcarddomain	8017 prod 8017 1024  yes
+admin   clubscoredomain	8018 prod 8018 1024  yes
+
