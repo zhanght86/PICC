@@ -2,19 +2,26 @@
 #coding:utf-8
 
 #初始化变量
-LOG_DIR=./logs
-SHELL_NAME=$0
-ORACLE_HOME=$HOME/Oracle/Middleware/wlserver_10.3
-TEMPLATE_DIR=./templates
-TEMPLATE_CREATE=createDomainTemplate.py
-TEMPLATE_ADMINSTART=adminServerStartTemplate.sh
-TEMPLATE_SERVERRESTART=restartTemplate.sh
-TMP_DIR=./tmp
+#directory
+BASE_DIR=$(cd `dirname $0`;pwd)
+LOG_DIR=${BASE_DIR}/logs
+SHELL_NAME=`basename $0`
+ORACLE_HOME=${HOME}/Oracle/Middleware/wlserver_10.3
+TEMPLATE_DIR=${BASE_DIR}/templates
+TMP_DIR=${BASE_DIR}/tmp
 
-
+#template files
+TEMPLATE_CREATE_FILE=${TEMPLATE_DIR}/createDomainTemplate.py
+TEMPLATE_ADMINSTART_FILE=${TEMPLATE_DIR}/adminServerStartTemplate.sh
+TEMPLATE_SERVERRESTART_FILE=${TEMPLATE_DIR}/restartTemplate.sh
 
 #调用weblogic函数脚本
-. ./weblogic_func.sh
+. ${BASE_DIR}/weblogic_func.sh
+
+#检查模板文件是否存在
+fileIsExist ${TEMPLATE_CREATE_FILE}
+fileIsExist ${TEMPLATE_ADMINSTART_FILE}
+fileIsExist ${TEMPLATE_SERVERRESTART_FILE}
 
 loggings "开始创建Weblogic Domain！"
 init=true
@@ -77,29 +84,24 @@ do
 	elif [ $createFlag == 'no' ]
 		then init=true
 	elif [ $createFlag == 'yes' ]
-		then
 
 #修改Domain创建模版文件  HOME SERVER_NAME PORT MODE  DOMAIN_NAME
-		if [ -f ${TEMPLATE_DIR}/${TEMPLATE_CREATE} ]
-			then sed -e "s:HOME:$HOME:g" -e "s/ADMIN_SERVER/$adminserver/g" -e "s/PORT/$adminport/g" -e "s/MODE/$domainmode/g" -e "s/DOMAIN_NAME/$domainname/g" ${TEMPLATE_DIR}/${TEMPLATE_CREATE} > ${TMP_DIR}/create${domainname}.py
-			echo "createDomainTemplate file is finished!"
-			logging "template文件内容为："
-			catlog ${TMP_DIR}/create${domainname}.py
-			logging "------------------end!"
+		then
+		sed -e "s:HOME:$HOME:g" -e "s/ADMIN_SERVER/$adminserver/g" -e "s/PORT/$adminport/g" -e "s/MODE/$domainmode/g" -e "s/DOMAIN_NAME/$domainname/g" /${TEMPLATE_CREATE_FILE} > ${TMP_DIR}/create${domainname}.py
+		echo "createDomainTemplate file is finished!"
+		logging "template文件内容为："
+		catlog ${TMP_DIR}/create${domainname}.py
+		logging "------------------end!"
 			
-		else
-			echo "The createDomainTemplate is missing!"
-			exit 0
-		fi
 #开始创建Domain
 		sh ${ORACLE_HOME}/common/bin/wlst.sh ${TMP_DIR}/create${domainname}.py
 
 		#在$Domain_Home/bin目录下添加启动脚本
-		sed -e "s/DOMAIN_NAME/$domainname/g" -e "s/ADMIN_PORT/$adminport/g" -e "s/SERVER_NAME/$adminserver/g" -e "s/MEMORY/512M/g" ${TEMPLATE_DIR}/${TEMPLATE_ADMINSTART} > $HOME/bea/user_projects/domains/${domainname}/bin/${adminserver}_start.sh
+		sed -e "s/DOMAIN_NAME/$domainname/g" -e "s/ADMIN_PORT/$adminport/g" -e "s/SERVER_NAME/$adminserver/g" -e "s/MEMORY/512/g" /${TEMPLATE_ADMINSTART_FILE} > $HOME/bea/user_projects/domains/${domainname}/bin/${adminserver}_start.sh
 		logging "添加主管启动脚本end！"
 		#在$HOME/yunwei/restart_shell目录下添加重启脚本
 		createPath ${HOME}/yunwei/restart_shell
-		sed -e "s/SERVER_NAME/$adminserver/g" -e "s/DOMAIN_NAME/$domainname/g" ${TEMPLATE_DIR}/${TEMPLATE_SERVERRESTART} > ${HOME}/yunwei/restart_shell/${adminserver}_restart.sh
+		sed -e "s/SERVER_NAME/$adminserver/g" -e "s/DOMAIN_NAME/$domainname/g" ${TEMPLATE_SERVERRESTART_FILE} > ${HOME}/yunwei/restart_shell/${adminserver}_restart.sh
 		logging "添加重启脚本end！"
 		exit 0
 	else
