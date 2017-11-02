@@ -1,0 +1,8 @@
+connect('weblogic','weblogic1234','t3://localhost:ADMIN_PORT')
+edit()
+startEdit()
+managedServer = create('MANAGE_SERVER','Server')
+managedServer.setListenPort(SERVER_PORT)
+save()
+activate(block="true")
+disconnect()
