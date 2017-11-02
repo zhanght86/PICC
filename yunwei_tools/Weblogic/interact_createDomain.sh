@@ -4,16 +4,16 @@
 #初始化变量
 #directory
 BASE_DIR=$(cd `dirname $0`;pwd)
-LOG_DIR=${BASE_DIR}/logs
 SHELL_NAME=`basename $0`
 ORACLE_HOME=${HOME}/Oracle/Middleware/wlserver_10.3
 TEMPLATE_DIR=${BASE_DIR}/templates
-TMP_DIR=${BASE_DIR}/tmp
+TMP_DIR=${BASE_DIR}/tmp                                                     #存放临时生成的wlst scripts
+LOG_DIR=${BASE_DIR}/logs
 
 #template files
-TEMPLATE_CREATE_FILE=${TEMPLATE_DIR}/createDomainTemplate.py
-TEMPLATE_ADMINSTART_FILE=${TEMPLATE_DIR}/adminServerStartTemplate.sh
-TEMPLATE_SERVERRESTART_FILE=${TEMPLATE_DIR}/restartTemplate.sh
+TEMPLATE_CREATE_FILE=${TEMPLATE_DIR}/createDomainTemplate.py                #主管创建脚本模板
+TEMPLATE_ADMINSTART_FILE=${TEMPLATE_DIR}/adminServerStartTemplate.sh        #主管启动脚本模板
+TEMPLATE_SERVERRESTART_FILE=${TEMPLATE_DIR}/restartTemplate.sh              #server重启脚本模板
 
 #调用weblogic函数脚本
 . ${BASE_DIR}/weblogic_func.sh
@@ -22,6 +22,8 @@ TEMPLATE_SERVERRESTART_FILE=${TEMPLATE_DIR}/restartTemplate.sh
 fileIsExist ${TEMPLATE_CREATE_FILE}
 fileIsExist ${TEMPLATE_ADMINSTART_FILE}
 fileIsExist ${TEMPLATE_SERVERRESTART_FILE}
+createPath $TMP_DIR
+createPath $LOG_DIR
 
 loggings "开始创建Weblogic Domain！"
 init=true
