@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="compile" name="crmweb">
+	<!--编译打包所需的属性设置 -->
+	<property environment="env" />
+	<!-- 定义编译生成的class存放路径 -->
+	<property name="builddir" value="build" />
+	<property name="classes.dir" value="${builddir}/classes/" />
+	<property name="webinfdir" value="WebContent/WEB-INF" />
+	<!-- web工程的依赖jar路径 -->
+	<property name="applibdir" value="${webinfdir}/lib" />
+	<property name="tomcatlibdir" value="D:/Program Files (x86)/apache-tomcat-6.0.35/lib" />
+	
+	<!--如果工程有多个模块的话，可以在这里定义子模块的路径，或者子模块新建一个build.xml,在这里调用也行
+	<property name="modules1" value="crmbase" />
+	<property name="modules1dir" value="../${modules1}/bin" />   -->
+	
+	<!-- 指定编译器，默认是jdk的javac编译器，但有些项目用的其它的编译器,此处为eclipse的JDTCompiler-->
+	<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter" />
+	
+	<!--服务器账号密码 -->
+	<property name="server.ip" value="10.10.68.242" />	
+	<property name="server.user" value="weblogic" />
+	<property name="server.pass" value="weblogic" />
+	<property name="server.port" value="22"	/>
+	<property name="restart.shell value="/home/weblogic/restart_shell/crmweb_restart.sh" />
+
+	<!-- weblogic 应用信息 -->
+	<property name="manage.port" value="7001" />
+	<property name="domain.user" value="weblogic" />
+	<property name="domain.pass" value="weblogic123" />
+	<property name="javahome" value="/usr/java/jdk1.6.0_45" />
+	<property name="apphome" value="/home/weblogic/Oracle/Middleware/user_projects/domains/base_domain" />	
+	<property name="project.name" value="crmweb" />
+	<property name="project.target" value="Server_crmweb" />
+	<property name="project.url" value="http://10.10.68.242:8014/crmweb" />
+	
+	
+	<!-- WEBLOGIC更新部署的命令参数,一般无需更改 -->
+	<property name="weblogic.lib" value="/home/weblogic/Oracle/Middleware/wlserver_10.3/server/lib" />
+	<property name="weblogic.deploy.para" value="weblogic.Deployer -adminurl t3://${server.ip}:${manage.port} -username ${domain.user} -password ${domain.pass}"  />
+	<property name="weblogic.undeploy" value="${javahome}/bin/java -cp ${weblogic.lib}/weblogic.jar ${weblogic.deploy.para}  -undeploy -name ${project.name}"  />
+	<property name="weblogic.deploy" value="${javahome}/bin/java -cp ${weblogic.lib}/weblogic.jar ${weblogic.deploy.para} -deploy  ${apphome}/${project.name} -target ${target}"    />
+	
+	<!--CLASSPATH设置，工程依赖包路径-->
+	<path id="classpath">
+		<pathelement location="${class.dir}" />
+		<fileset dir="${applibdir}" >
+			<patternset>
+				<include name="*.jar" />
+			</patternset>
+		</fileset>
+		<fileset dir="${tomcatlibdir}">
+			<patternset>
+				<include name="*.jar" />
+			</patternset>
+		</fileset>
+	</path>
+	
+	<!--初始化，删除上次部署生成的文件 -->
+	<target name="init">
+		<echo message="清理上次生成" />
+		<delete dir="${classes.dir}" />
+		<!--<delete dir="${modules1dir}" />-->
+		<mkdir dir="${classes.dir}" />
+		<!--<mkdir dir="${modules1dir}" />-->
+		</target>
+	
+	<!-- 编译 -->
+	<!-- 子模块的编译，如有的话
+	<target name="compile_module1" depends="init" description="先按依赖顺序编译子模块，如果有的话">
+		<javac srcdir="../${modules1}" destdir="${modules1dir}" classpathref="classpath" encoding="UTF-8" includeAntRuntime="false" />
+		<jar destfile="${applibdir}/${modules1}.jar" basedir="${modules1dir}" />
+	</target> -->
+	
+	<target name="compile" depends="compile_module1" description="编译主工程">	
+		<javac srcdir="./src" destdir="${classes.dir}" source="1.6" target="1.6" classpathref="classpath" includeAntRuntime="false" nowarn="on" deprecation="true" debug="true" encoding="UTF-8" />
+		<echo message="编译完毕" />
+	</target>
+
+	<!-- 打包，如果需要的话 -->
+	<target name="package" depends="compile" description="打包">
+		<!-- 复制classdir到webinf目录下 -->
+		<copydir src="${class.dir} dest="${webinfdir} />
+		
+		<!-- 复制src目录下的的配置文件到$webinfdir/classes目录下 -->
+		<copy includeemptydirs="false" todir="${webinfdir}/class">
+			<fileset dir="src">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>	
+		<jar destfile="${build}/${ant.project.name}.war" basedir="WebContent" description="这里打一个war包"/>
+		<echo> ${ant.project.name}打包完成 </echo>
+	</target>
+	
+	<!-- 上传war包到目标服务器 -->
+	<target name="uploadwar">	
+		<sshexec host="${server.ip}" username="${server.user}" password="${server.pass}" trust="true" command="mv ${apphome}/{project.name}.war backupdir" />
+		<echo message="备份上次的版本完毕" />
+		
+		<scp file="${build}/${ant.project.name}.war" todir="${server.user}:${server.pass}@${server.ip}:${apphome}" trust="true" />
+		<echo message="上传war包完毕" />
+	</target>
+	
+	<!--重启服务 -->
+	<target name="restart">
+		<echo message="重启服务" />
+		<sshexec host="${server.ip}" username="${server.user}" password="${server.password}" trust="true" command="sh ${restart.shell}" />
+	</target>	
+	
+	<!-- 卸载应用,建议直接重启,当一个端口部署了多代码的时候建议采用此方法 -->
+	<target name="undeploy" >
+		<exec command="${weblogic.undeploy}" />
+		<echo message="卸载应用完毕" />
+	</target>
+	
+	<!-- 部署应用,建议直接重启,当一个端口部署了多套代码的时候建议采用此方法 -->
+	<target name="deploy" >
+		<exec command="${weblogic.deploy}" />
+		<echo message="部署应用完毕" />
+	</target>
+	
+	<!-- 访问应用的web页面,检查是否可用 -->
+	<target name="available">
+		<trycatch>
+			<try>
+				<getMethod url="${server.url}" statusCodeProperty="responseCode" />
+			</try>
+			<catch>
+				<property name="responseCode" value="400" />
+			</catch>
+		</trycatch>
+		<if>
+			<or>
+				<equals arg1="${responseCode}" arg2="302" trim="true" casesensitive="false" />
+				<equals arg1="${responseCode}" arg2="200" trim="true" casesensitive="false" />
+			</or>
+			<then>
+				<echo>Success</echo>
+				<echo message="${project.name} 访问成功：${server.url} ${responseCode}" />
+			</then>
+			<else>
+				<echo message="${project.name} 访问失败：${server.url} ${responseCode}"/>
+				<fail message="${project.name} 访问失败：${server.url} ${responseCode}"/>
+			</else>
+		</if>
+	</target>
+</project>
