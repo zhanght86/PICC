@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project default="init" basedir="." name="propertiy">
+<!--svn日志输出-->
+<property name ="svn.log" value="customer-testonline_log.xml"/>
+<!--CUS测试分支-->
+<property name="code.base" value="customer_Testonline"/>
+<!--脚本盘符-->
+<property name="script.locate" value="H:"/>
+<!--源代码目录-->
+<property name="src.dir" value="H:\source-testonline\${code.base}"/>
+	<!--jenkins目录-->
+<property name="jenkins.dir" value="H:\source-testonline\${code.base}"/>
+
+<property name="antfile.dir" value="${jenkins.dir}\jenkins_xml"/>
+<!--list.txt目录-->
+<property name="list.path" value="${jenkins.dir}"/>
+<!--临时路径-->
+<property name="temp.dir" value="${jenkins.dir}\jenkins_temp"/>
+<!--测试环境175路径-->
+<property name="remote.dir" value="/home/ebss/ebssworkarea/cusmantestworkarea/mis/WEB-INF/lib"/>
+<!--内部类目录-->
+<property name="innerclass.dir" value="innerclass"/>
+<!--升级包路径-->
+<property name="update.dir" value="${antfile.dir}\updatefile"/>
+
+<!--生产备份文件清单-->
+<property name="backlist" value="./temp/list.txt"/>
+<!--打包文件清单文件名-->
+<property name="packlist.name" value="filelist.txt"/>
+<!--码线url-->
+<property name="testnotonline.cus.url" value="http://11.205.50.47:8000/svn/Customer/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline"/>
+
+<!--服务器信息-->
+<property name="host.ip" value="10.10.40.25"/>
+<property name="host.userid" value="jenkins"/>
+<property name="host.password" value="test4321"/>
+<property name="customer.lib" value="H:\source-testonline\customer_Testonline\customer\target"/>
+<property name="paltformForMangerM.lib" value="H:\source-testonline\customer_Testonline\paltformForMangerM\target"/>
+<property name="rms.lib" value="H:\source-testonline\customer_Testonline\rms\target"/>
+<property name="support.lib" value="H:\source-testonline\customer_Testonline\support\target"/>
+<property name="util.lib" value="H:\source-testonline\customer_Testonline\util\target"/>
+<property name="ympromote.lib" value="H:\source-testonline\customer_Testonline\ympromote\target"/>
+<property name="insureBox.lib" value="H:\source-testonline\customer_Testonline\insureBox\target"/>
+<property name="newCustomer.lib" value="H:\source-testonline\customer_Testonline\newCustomer\target"/>
+<property name="interfaceAndTimingTask.lib" value="H:\source-testonline\customer_Testonline\interfaceAndTimingTask\target"/>
+<property name="cpiBusiness.lib" value="H:\source-testonline\customer_Testonline\cpiBusiness\target"/>
+<property name="noCarProductConfigure.lib" value="H:\source-testonline\customer_Testonline\noCarProductConfigure\target"/>
+<property name="buyCar.lib" value="H:\source-testonline\customer_Testonline\buyCar\target"/>
+
+</project>

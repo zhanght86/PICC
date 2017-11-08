@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project default="merge" basedir="." name="mergemain">
+
+<import file="property.xml" />
+<property file="${jenkins.dir}\jenkins_temp\jiraTask.property"/>
+<import file="mergeinfo.xml" as="propertyset" />
+
+<!--自定义类-->
+<taskdef name="listget" classname="hayden.TaskSvnRegGet" />
+<taskdef name="erro" classname="hayden.BuildFail" />
+<taskdef name="out" classname="hayden.OutPutInfo" />
+<taskdef name="fileCombin" classname="hayden.FileCombin" />
+<taskdef name="sqlSort" classname="hayden.SortContain" />
+<!--ant扩展库，需要将antcontrib放入ant lib中-->
+<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+<!--每次启动之前先清理临时文件-->
+<target name="cleartempdir">
+		<delete includeEmptyDirs="true" quiet="true">
+		 <fileset dir="${temp.dir}\file" />
+	  </delete>
+	<mkdir dir="${temp.dir}/file" />
+	<delete>
+		<fileset dir="${temp.dir}">
+			<include name="*.txt"/>
+		</fileset>
+	</delete>
+	<delete>
+		<fileset dir="${jenkins.dir}">
+			<include name="*.zip"/>
+		</fileset>
+	</delete>
+</target>
+
+<!--处理jiraTask中包含的echo信息-->
+<target name="jiraTaskContain" depends="condi" unless="jiraMan.set">
+	<erro msg="未输入jiraTask号，构建失败"/>
+</target>
+<target name="jiraTaskPropertyCheck" depends="jiraTaskContain" if="jiraMan.set">
+	<echo message="jira编号:${jiraTask.man}"/>
+	<echo file="${temp.dir}\jiraTask.property" message="jiraTask=${jiraTask.man}"/>
+</target>
+<!--检查svn备注的规范性-->
+<target name="checkxml" >
+	<echo message="*****************版本提交注释不规范，需要注意对应版本不会加入版本清单中******************************"/>
+	<listget xmlFile="${temp.dir}\${svn.log}" xmlCheck="true"/>
+	<!--listget xmlFile="${jenkins.dir}\${src.dir}_sql.xml" xmlCheck="true"/-->
+	<!--listget xmlFile="${jenkins.dir}\$_xml.xml" xmlCheck="true"/-->
+	<echo message="*****************版本提交注释规范性检查结束**********************************************************"/>
+</target>
+<!--根据jiraTask循环进行文件清单查找及归并-->
+<target name="loop" >
+<for list="${jiraTask}" param="taskno">
+  <sequential>
+  <echo message="当前正在合并jira编号：@{taskno}"/>
+	<listget xmlFile="${temp.dir}\${svn.log}" listFile="${temp.dir}\${packlist.name}" propertyFile="${antfile.dir}\mergeinfo.xml" jiraTask="@{taskno}"/>
+	<exec dir="${jenkins.dir}" executable="cmd"  failonerror="true">
+		<arg value="/c"/>
+	  	<arg line="svn update ."/>
+	</exec>
+	<antcall target="merge-dry" />
+    <!--<antcall target="merge" /-->
+	<antcall target="throwerro" />
+	<antcall target="commit"/>
+	<echo message="合并完成jira编号：@{taskno}"/>
+	<echo message="****"/>
+	<echo message=" "/>
+	<echo message=" "/>
+	<echo message=" "/>
+	<echo message=" "/>
+  </sequential>
+</for>
+</target>
+
+<!--定义svn相关ant扩展类-->
+  <path id="svnant.classpath">
+    <fileset dir="E:\apache-ant-1.8.2\lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path> 
+  <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+
+
+<!--先进行模拟归并，确定是否需要进行归并，并提前检查是否存在冲突-->
+<target name="merge-dry" depends="msglog" if="commitmsg.true" >
+	<antcallback  target="propertyset.property.set" return="version,commitmsg"/>
+	<echo message="模拟归并，版本号：${version}"/>
+	<exec dir="${jenkins.dir}" executable="cmd"  failonerror="ture" output="${temp.dir}\mergelog.txt">
+		 <arg value="/c"/>
+  			<arg line="svn merge --dry-run -c${version} ${testnotonline.cus.url} . "/>
+	</exec>
+	<antcall  target="merge" />
+</target>
+
+<!--版本归并-->
+<target name="merge" depends="isMerge" unless="should2merge">
+	<antcallback  target="propertyset.property.set" return="version,commitmsg"/>
+	<echo message="开始归并版本：${version}"/>
+	<exec dir="${jenkins.dir}" executable="cmd"  failonerror="ture" output="${temp.dir}\mergelog.txt">
+		<arg value="/c"/>
+	  	<arg line="svn merge -c${version} ${testnotonline.cus.url} ."/>
+	</exec>
+</target>
+
+<!--检查合并过程是否报错-->
+<target name="sucess" depends="ConErro" unless="erro.true" >
+	<echo message="版本归并成功，详细归并日志如下(为空就是未合并版本）" />
+	<out srcFile="${temp.dir}\mergelog.txt"/>
+</target>
+
+<!--如果包含错误，则抛出异常，构建失败-->
+<target name="throwerro" depends="sucess" if="erro.true" >
+	<out srcFile="${temp.dir}\mergelog.txt"/>
+	<echo message="版本合并异常，可能情况为"/>
+	<echo message="1.无可合并内容"/>
+	<echo message="2.存在冲突"/>
+	<erro msg="如无可合并版本，可直接进行版本更新即可"/>
+</target>
+
+<!--提交归并结果-->
+  <target name="commit" depends="ConCommit" if="merge.true">
+    <antcallback  target="propertyset.property.set" return="version,commitmsg"/>
+	<echo message="提交版本：${version}"/>
+  		<exec dir="${jenkins.dir}" executable="cmd"  failonerror="ture">
+			<arg value="/c"/>
+		    <arg line="svn update"/>
+		</exec>
+  	<echo message="${commitmsg}" />
+    <svn javahl="false" >
+     	<commit message="${commitmsg}" dir="${jenkins.dir}" />
+    </svn>
+  </target>
+
+
+
+<!--最后检测文件清单是否为空，为空的话，则无需要更新，或清单获取失败-->
+<target name="listempty" depends="condi" if="list.empty">
+	<erro msg="更新清单为空，构建失败"/>
+</target>
+	
+<!--以下为判断模块-->	
+<target name="ConCommit">
+	<!--检查是否有进行归并，归并日志中包含merging-->
+	<condition property="merge.true">
+		<resourcecontains resource="${temp.dir}\mergelog.txt" substring="Merging"/>
+	</condition>
+</target>
+<target name="ConErro">
+	<!--检测归并过程中是否包含错误或需要人工合并-->
+	<condition property="erro.true">
+		<or>
+			<resourcecontains resource="${temp.dir}\mergelog.txt" substring="Summary of conflicts:"/>
+			<resourcecontains resource="${temp.dir}\mergelog.txt" substring="Conflict"/>
+			<resourcecontains resource="${temp.dir}\mergelog.txt" substring="Select:"/>
+			<resourcecontains resource="${temp.dir}\mergelog.txt" substring="Cannot merge"/>
+			<resourcecontains resource="${temp.dir}\mergelog.txt" substring="svn: E"/>
+		 </or>
+	</condition>
+</target>
+<target name="isMerge">
+	<!--检查是否需要进行归并-->
+	<condition property="should2merge">
+		<length file="${temp.dir}\mergelog.txt" length="0" />
+	</condition>
+</target>
+<!--判断,是否找到了对应的版本及路径-->
+<target name="msglog">
+ <antcallback  target="propertyset.property.set" return="find"/>
+	<condition property="commitmsg.true">
+		<istrue value="${find}"/>
+	</condition>
+	<condition property="commitmsg.false">
+		<isfalse value="${find}"/>
+	</condition>
+</target>
+
+<target name="condi">
+	<!--判断是否更新清单为空-->
+	<condition property="list.empty">
+		<and>
+			<!--length file="${jenkins.dir}\temp_xmlist.txt" length="0" />
+			<length file="${jenkins.dir}\temp_sqlist.txt" length="0" /-->
+			<length file="${temp.dir}\${packlist.name}" length="0" />
+		</and>
+	</condition>
+	<!--判断输入的参数是否为空-->
+	<condition property="jiraMan.set">
+		<isset property="jiraTask.man"/>
+	</condition>
+	<echo message="${jiraMan.set}"/>		
+</target>
+</project>

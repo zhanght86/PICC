@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!--记录版本号和commit message，如果查询到，则find为true，否则为false-->
+<project default="test" basedir="." name="mergeinfo">
+  <target name="propertyset.property.set">
+    <property name="version" value="16783,16784,16785,16789,16790,16791,16793,16794,16795,16796,16797,16798,16799,16801,16802,16822,16823,16824,16826,16836,16837,16838,16839,16841,16842,16844,16857,16858,16860,16863,16864,16866,16867,16872,16873,16874,16923" />
+    <property name="commitmsg" value="TFS-1276786|TFS-1276786#人保购车汇管理员配置功能 xieyanwei 20171108" />
+    <property name="find" value="true" />
+  </target>
+</project>
+

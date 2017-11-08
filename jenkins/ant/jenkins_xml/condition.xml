@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="init" basedir="." name="condition">
+<import file="property.xml" />
+<taskdef name="sort" classname="hayden.SortContain" />
+<taskdef name="utility" classname="hayden.UtilitySum"/>
+<!--清单处理-->
+<target name="listrep" >
+<replace file="${temp.dir}\${packlist.name}"  >
+<!--<replacefilter token="${replaced.text}" value="${replace.str}"/>-->
+<!--配置文件修改-->
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/spring/applicationContext-hibernate.xml_CS" value="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/spring/applicationContext-hibernate.xml" />
+
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/interfaceAndTimingTask/src/main/resources/spring/applicationContext-timingTask.xml_CS" value="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/interfaceAndTimingTask/src/main/resources/spring/applicationContext-timingTask.xml" />
+
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/util/src/main/resources/url/url.properties_CS" value="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/util/src/main/resources/url/url.properties" />
+
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/config/jdbc.properties_CS" value="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/config/jdbc.properties" />
+
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/spring/applicationContext-cs-action.xml_CS" value="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/spring/applicationContext-cs-action.xml" />
+
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/config/sysConstant.properties_IDC_CS" value="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/config/sysConstant.properties" />
+
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/spring/applicationContext-dubbo-consumer.xml_CS" value="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/resources/spring/applicationContext-dubbo-consumer.xml" />
+
+<!--配置文件修改结束-->
+<replacefilter token=".java" value=".class"/>
+<replacefilter token="	Modified" value="" />
+<replacefilter token="mis/src/main/java/" value="mis/src/main/webapp/WEB-INF/classes/"  />
+<replacefilter token="mis/src/main/resources" value="mis/src/main/webapp/WEB-INF/classes" />
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/mis/src/main/webapp/" value="" />
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/" value="" />
+<replacefilter token="/trunk/customerManage_version1/customer_Testnotonline/customer_Testnotonline/" value="" />
+
+
+</replace>
+
+<!--打包清单-->
+<replace file="${temp.dir}\${packlist.name}" >
+<replacefilter token="${replaced.str}/" value=""/>
+</replace>
+ <echo message="清单处理完毕"/>
+
+<sort srcFile="${temp.dir}\${packlist.name}"  removeRepeat="true"/>
+</target>
+
+<!--升级清单包含特殊内容判断start-->
+<target name="init">
+
+<echo>当前路径为：${basedir}</echo>
+
+<condition property="customer.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="customer"/>
+</condition>
+<condition property="cpiBusiness.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="cpiBusiness"/>
+</condition>
+<condition property="paltformForMangerM.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="paltformForMangerM"/>
+</condition>
+<condition property="rms.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="/rms/"/>
+</condition>
+<condition property="support.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="support"/>
+</condition>
+<condition property="util.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="util/"/>
+</condition>
+<condition property="ympromote.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="ympromote"/>
+</condition>
+<condition property="insureBox.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="insureBox"/>
+</condition>
+<condition property="newCustomer.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="newCustomer"/>                                                                 
+</condition>
+<condition property="noCarProductConfigure.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="noCarProductConfigure"/>                                                                 
+</condition>
+<condition property="buyCar.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="buyCar"/>                                                                 
+</condition>
+<condition property="interfaceAndTimingTask.true">
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring="interfaceAndTimingTask"/>
+                                                                    
+</condition>
+
+<!--是否有jar包修改,判断文件清单是否有pom.xml文件-->
+<condition property="java.true">
+<or>
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring=".class"/>
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring=".xml"/>
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring=".java"/>
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring=".jar"/>
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring=".jsp"/>
+<resourcecontains resource="${temp.dir}\${packlist.name}" substring=".js"/>
+</or>
+</condition>
+
+
+</target>
+
+</project>
+
