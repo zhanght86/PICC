@@ -23,6 +23,7 @@ EOF
 
     elif [ "$choice" = 2 ]
         then
+        logging "您选择了重启weblogic 服务"
         n=1
         declare restart
         restart[0]="<0> 返回上一级菜单"
@@ -37,7 +38,8 @@ EOF
             then continue
 
         elif [[ ${!restart[@]} =~ $choice ]]
-            then sh ${restart[$choice]}
+            then logging "您选择了重启${restart[$choice]}"
+            sh ${restart[$choice]}
         else
             logging "为啥不按提示的输呢？"
         fi
