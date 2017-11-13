@@ -1,0 +1,9 @@
+#mainmenu.txt
+<1> <查看服务器参数> <type1> Others/systeminfo.sh
+<2> <启停Weblogic服务> <type2> weblogic/startstop.sh
+<3> <启停微服务> <type4> 
+<4> <应用服务日志> <type6>
+<5> <Weblogic管理> <type7>
+<6> <清理磁盘空间> <type0>
+<7> <其它工具> <type3> 
+<0> <退出登陆> <type1>
