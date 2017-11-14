@@ -47,7 +47,7 @@ ID = sys.argv[1]
 ID = int(ID)
 print source
 print target
-print ID
+print "输入的工作项ID为：",ID
 #IDs = IDs.split(',')
 
 
@@ -55,6 +55,7 @@ print ID
 print u"登陆账号为：", username
 print u"登陆团队资源集合为：", project_name
 
+#连接到团队资源集合
 credentials = UsernamePasswordCredentials(username,password)
 url = URIUtils.newURI(connection_url)
 tpc = TFSTeamProjectCollection(url,credentials)
@@ -70,58 +71,62 @@ if not workitem:
 else:
     #getMergeCandidate
     versioncontrolclient = tpc.getVersionControlClient()
-    mergeCandidates = versioncontrolclient.getMergeCandidates(source,target,RecursionType.FULL,MergeFlags.BASELE
-    #判断未合并变更集列表关联的工作项中是否有输入的workitem ID，如果有，则提取变更集列表
+    mergeCandidates = versioncontrolclient.getMergeCandidates(source,target,RecursionType.FULL,MergeFlags.BASELESS)
+    #判断未合并变更集列表关联的工作项中是否有输入的workitem ID，如果有，则提取变更集列表changesets
     changesets = []
     for i in mergeCandidates:
         comment = i.getChangeset().getComment()
         changesetid = i.getChangeset().getChangesetID()
-        print  changesetid,": ",comm
+        print  changesetid,": ",comment
         workitems = i.getChangeset().getWorkItems(workitemclient)
         if not workitems:
             print "This changeset hasn`t relate to any workitems:",i.getChangeset().getChangesetID(),"Please check!"
         else:
             for x in workitems:
                 if x.getID() == ID:
-                    changesets.append(i.getChangeset
-    #如果根据rem ID查询到了可合并的变更集，则开始执行合并
+                    changesets.append(i.getChangeset())
+    #如果根据rem ID查询到了相关联的可合并变更集，则开始执行合并
     if not changesets:
         print "There is no changesets to merge,Please check!"
         tpc.close()
-        raise Exception("There is no changesets to merge,Please check
+        raise Exception("There is no changesets to merge,Please check")
     else:
         print "*"*30
-        print "Start to merge changesets:",changes
+        print "Start to merge changesets:",changesets
         workspace = versioncontrolclient.getWorkspace(target)
         #先撤销本地更改，再更新本地工作区，最后开始合并
         itemspecs = [ItemSpec(target,RecursionType.FULL),]
         print "undo changes count is :",workspace.undo(itemspecs)
         workspace.get(GetOptions.GET_ALL)
-        print "Update workspace successfull
+        print "Update workspace successfull!"
         for i in changesets:
             print "*"*30
             print "Merging Changeset：", i.getChangesetID()
             v_spec = ChangesetVersionSpec(i.getChangesetID())
-            mergestatus = workspace.merge(source,target,v_spec,v_spec,LockLevel.NONE,RecursionType.FULL,MergeFlags.NO
+            mergestatus = workspace.merge(source,target,v_spec,v_spec,LockLevel.NONE,RecursionType.FULL,MergeFlags.NONE)
             if mergestatus.getFailures():
                 print "error code is : ",mergestatus.getFailures()[0].getCode()
                 print "Please merge Changeset",i," manually！"
                 tpc.close()
-                raise Exception("Please merge Changeset",i," manually
+                raise Exception("Please merge Changeset",i," manually!")
             elif mergestatus.getNumConflicts():
                 print "conflicts count is : ",mergestatus.getNumConflicts()
                 print "Please merge Changeset",i," manually！"
                 tpc.close()
-                raise Exception("Please merge Changeset",i," manually
+                raise Exception("Please merge Changeset",i," manually!")
             else:
                 print "Changeset: ",i.getChangesetID()," merging successfully!"
                 print "*"*30
-                print "Start to checkin this changset.
+                print "Start to checkin this changset."
                 #开始单个变更集的合并完成后就开始签入
                 workitemcheckininfos = [WorkItemCheckinInfo(workitem),]
-                pendingchanges = workspace.getPendingChanges().getPendingChanges()
+                #pendingchanges = workspace.getPendingChanges().getPendingChanges()
+                #pendingchanges = workspace.getPendingChanges(serverpath,RecursionType.FULL,None).getPendingChanges()
+                pendingchanges = workspace.getPendingChanges(itemspecs,None).getPendingChanges()
                 print "签入项为："
-                print pendingchanges[0].getLocalItem()
+                for x in pendingchanges:
+                    print x.getLocalItem()
+                #print pendingchanges[0].getLocalItem()
                 try:
                     workspace.checkIn(pendingchanges,i.getComment(),None,workitemcheckininfos,None)
                     print "checin sucessfully!"
