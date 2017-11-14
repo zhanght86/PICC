@@ -122,7 +122,7 @@ else:
                 workitemcheckininfos = [WorkItemCheckinInfo(workitem),]
                 #pendingchanges = workspace.getPendingChanges().getPendingChanges()
                 #pendingchanges = workspace.getPendingChanges(serverpath,RecursionType.FULL,None).getPendingChanges()
-                pendingchanges = workspace.getPendingChanges(itemspecs,None).getPendingChanges()
+                pendingchanges = workspace.getPendingChanges(itemspecs,False).getPendingChanges()
                 print "签入项为："
                 for x in pendingchanges:
                     print x.getLocalItem()
