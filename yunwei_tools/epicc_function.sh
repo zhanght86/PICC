@@ -52,3 +52,13 @@ function checkLogin() {
         exit 0
     fi
 }
+
+#确认函数
+function confirm() {
+    if [ "$1" == 'yes' ]
+        then logging "您输入了yes！"
+    else
+        logging "退出！"
+        exit 0
+    fi
+}
