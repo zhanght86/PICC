@@ -1,0 +1,7 @@
+<applicationservicelogmenu> <1> <截取当天应用服务日志> <type2> /applicationservicelogsh cutserverlogbynow.sh
+<applicationservicelogmenu> <2> <截取历史应用服务日志> <type2> /applicationservicelogsh cutserverlogbyold.sh 
+<applicationservicelogmenu> <3> <截取自定义文件日志> <type10> /applicationservicelogsh cutserverlogbycustom.sh
+<applicationservicelogmenu> <0> <返回上一层路径> <type1>
+
+
+
