@@ -2,6 +2,6 @@
 <1> <清理WeblogicServer日志> <type1> shs/clear_serverlog.sh
 <2> <修改Weblogic密码> <type2> shs/change_password.sh
 <3> <修改数据源> <type4> shs/change_datasource.sh
-<4> <创建单个Domian> <type6> shs/interact_createdomain.sh
+<4> <创建单个Domian> <type6> interact_createdomain.sh
 <5> <批量创建Domian> <type7> shs/batch_createdomain.sh
 <0> <返回上一级> <type1>

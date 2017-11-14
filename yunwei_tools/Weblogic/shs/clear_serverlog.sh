@@ -5,10 +5,10 @@
 
 #给定domain存放的路径
 if [ -n "$DOMAINS_HOME" ]
-    then logging "Domain 路径为：" $DOMAINS_HOME
+    then logging "Domain 路径为：$DOMAINS_HOME" 
 else
     DOMAINS_HOME=${HOME}/bea/user_projects/domains
-    logging "默认Domain 路径为：" $DOMAINS_HOME
+    logging "默认Domain 路径为：$DOMAINS_HOME" 
 fi
 
 echo "清理${DOMAINS_HOME}/logs下的日志："
