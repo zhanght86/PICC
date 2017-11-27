@@ -20,6 +20,8 @@ from com.microsoft.tfs.core.clients.versioncontrol.specs import ItemSpec
 
 #update
 from com.microsoft.tfs.core.clients.versioncontrol import GetOptions
+from com.microsoft.tfs.core.clients.versioncontrol.specs.version import WorkspaceVersionSpec
+from com.microsoft.tfs.core.clients.versioncontrol.soapextensions import GetRequest
 
 #merge
 from com.microsoft.tfs.core.clients.versioncontrol.specs.version import ChangesetVersionSpec
@@ -95,9 +97,14 @@ else:
         print "Start to merge changesets:",changesets
         workspace = versioncontrolclient.getWorkspace(target)
         #先撤销本地更改，再更新本地工作区，最后开始合并
-        itemspecs = [ItemSpec(target,RecursionType.FULL),]
+        itemspec = ItemSpec(target,RecursionType.FULL)
+        itemspecs = [itemspec,]
         print "undo changes count is :",workspace.undo(itemspecs)
-        workspace.get(GetOptions.GET_ALL)
+
+        workv_spec = WorkspaceVersionSpec(workspace)
+        get_request = GetRequest(itemspec,workv_spec)
+
+        workspace.get(get_request,GetOptions.GET_ALL)
         print "Update workspace successfull!"
         for i in changesets:
             print "*"*30
