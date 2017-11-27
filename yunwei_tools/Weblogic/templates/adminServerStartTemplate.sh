@@ -25,7 +25,8 @@ Init_Username="weblogic"
 Init_Password="weblogic1234"
 
 #Domain相关的变量
-Log_Name="/log/${Domain_Name}/${Server_Name}.log"
+Log_Dir=/jlbnfs
+Log_Name="${Log_Dir}/${Domain_Name}/${Server_Name}.log"
 Domain_Path="${HOME}/bea/user_projects/domains/${Domain_Name}"
 Server_Path="${Domain_Path}/servers/${Server_Name}"
 
@@ -49,7 +50,7 @@ else
 fi
 }
 #创建所需目录
-createPath /log/${Domain_Name}                                         #Domain日志主路径
+createPath ${Log_Dir}/${Domain_Name}                                        #Domain日志主路径
 createPath ${Server_Path}/security                                     #创建密码文件路径    
 
 #新建密码文件

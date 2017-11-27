@@ -11,6 +11,10 @@ TMP_DIR=${BASE_DIR}/tmp                                                     #存
 LOG_DIR=${BASE_DIR}/logs
 RESTART_DIR=${HOME}/yunwei/restart_shell
 
+IP=`ip add list dev eth0|grep global|awk '{print $2}'|awk -F / '{print $1}'`
+suffix1=`echo ${IP}|awk -F . '{print $3}'`
+suffix2=`echo ${IP}|awk -F . '{print $4}'`
+
 #template files
 TEMPLATE_CREATE_FILE=${TEMPLATE_DIR}/createDomainTemplate.py                #主管创建脚本模板
 TEMPLATE_ADMINSTART_FILE=${TEMPLATE_DIR}/adminServerStartTemplate.sh        #主管启动脚本模板
@@ -69,7 +73,7 @@ if [ $mode == "0" ]
 		done
 	
 	#主管server name
-	 	adminserver=${domainname%domain*}server_${adminport}
+	 	adminserver=${domainname%domain*}server_${suffix1}_${suffix2}_${adminport}
 			
 	#输出domain信息
 		#echo  Domain name is $domainname.
@@ -172,7 +176,7 @@ elif [ $mode == "1" ]
 		logging "请输入主管IP,若为本机IP则按enter跳过："
 		read adminIP
 
-		manageserver=${domainname%domain*}server_${serverport}
+		manageserver=${domainname%domain*}server_${suffix1}_${suffix2}_${serverport}
 
 		logging "以下为Domain信息："
 		logging "Domain name is $domainname."

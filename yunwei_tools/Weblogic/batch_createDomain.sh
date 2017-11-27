@@ -5,11 +5,15 @@
 #directory
 BASE_DIR=$(cd `dirname $0`;pwd)
 SHELL_NAME=`basename $0`
-ORACLE_HOME=${HOME}/Oracle/Middleware/wlserver_10.3
+ORACLE_HOME=${HOME}/bea/wlserver_10.3
 TEMPLATE_DIR=${BASE_DIR}/templates
 TMP_DIR=${BASE_DIR}/tmp                                                          #存放临时生成的文件
 RESTART_DIR=${HOME}/yunwei/restart_shell
 LOG_DIR=${BASE_DIR}/logs
+
+IP=`ip add list dev eth0|grep global|awk '{print $2}'|awk -F / '{print $1}'`
+suffix1=`echo ${IP}|awk -F . '{print $3}'`
+suffix2=`echo ${IP}|awk -F . '{print $4}'`
 
 #template files
 TEMPLATE_CREATE_MESSAGE=${TEMPLATE_DIR}/createMessage.txt                        #批量创建Domain配置文件
@@ -70,7 +74,7 @@ elif [ "${BATCH_CREATE}" == "true" ]
 			domainport=${domsg[2]}
 			domainmode=${domsg[3]}
 			domainmory=${domsg[5]}
-			adminserver=${domainname%domain*}server_${domainport}
+			adminserver=${domainname%domain*}server_${suffix1}_${suffix2}_${domainport}
 
 			logging	"Domain name is ${domsg[1]}!"
 			logging	"Domain port is ${domsg[2]}!"
@@ -100,7 +104,7 @@ elif [ "${BATCH_CREATE}" == "true" ]
 			serverport=${domsg[4]}
 			#servermory=${domsg[5]}
 			servermory=`echo ${domsg[*]}|awk '{print $6}'`
-			manageserver=${domainname%domain*}server_${serverport}
+			manageserver=${domainname%domain*}server_${suffix1}_${suffix2}_${serverport}
 
 			logging	"Domain name is $domainname."
 			logging	"Domain port is $domainport."
