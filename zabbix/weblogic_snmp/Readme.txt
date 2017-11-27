@@ -9,5 +9,12 @@
 #c,例如：10.133.214.106 - 7003 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17003 - crmweb - yes
 #注：三个文件必须位于同一目录下，编辑好配置文件后，在creteZabbix.py最后三行注释掉不需要使用的函数执行"python createZabbix.py"即可。
 
-10.133.214.107 - 7001 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17001 - crmweb - yes
+10.133.210.13 - 7003 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17003 - clubweb - yes
+10.133.210.14 - 7003 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17003 - clubweb - yes
+10.133.210.15 - 7003 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17003 - clubweb - yes
+10.133.210.16 - 7003 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17003 - clubweb - yes
+10.133.210.13 - 7004 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17004 - merchant - yes
+10.133.210.14 - 7004 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17004 - merchant - yes
+10.133.210.15 - 7004 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17004 - merchant - yes
+10.133.210.16 - 7004 - FS_CLUB,Linux servers - Template_CLUB_OS_Linux - 17004 - merchant - yes
 

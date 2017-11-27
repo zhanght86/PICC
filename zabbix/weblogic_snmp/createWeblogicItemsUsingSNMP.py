@@ -24,7 +24,7 @@ def createHost():
       tpid = z.getTemplateID(htemplates)
       z.createHost(ip, gpid, tpid)
 
-添加Item
+#添加Item
 def createItem():
   for i in c:
     if i.startswith("#") or i.startswith(" "):
@@ -48,20 +48,20 @@ def createItem():
       iname = "HttpConnectionsCount_" + port
       appid = z.getApplicationID("Weblogic,HttpConnectionsCount",hostid)
       oid = z.getHttpSnmpOid(ip,mport)
-      print "HttpConnectionsCount OID为：" + oid
+      print "HttpConnectionsCount OID为：" , oid
       z.createSnmpItem(hostid=hostid,intfid=intfid,iname=iname,oid=oid,appid=appid)
 
 #添加OpenSessionsCurrentCount
       iname = "OpenSessionsCurrentCount_" + port 
       oid = z.getSessionSnmpOid(ip,mport,app)
-      print "OpenSessionsCurrentCount OID为：" + oid
+      print "OpenSessionsCurrentCount OID为：" , oid
       appid = z.getApplicationID("Weblogic,OpenSessionsCurrentCount",hostid)
       z.createSnmpItem(hostid=hostid,intfid=intfid,iname=iname,oid=oid,appid=appid)
 
 #添加JvmHeapFreePercent
       iname = "JvmHeapFreePercent_" + port
       oid = z.getSnmpOid(ip,mport,".1.3.6.1.4.1.140.625.340.1.52")
-      print "JvmHeapFreePercent OID为：" + oid
+      print "JvmHeapFreePercent OID为：" , oid
       appid = z.getApplicationID("Weblogic,JvmHeapFreePercent",hostid)
       units="%"
       z.createSnmpItem(hostid=hostid,intfid=intfid,iname=iname,oid=oid,appid=appid,units=units)
@@ -158,6 +158,6 @@ def createTrigger():
 
 if __name__ == "__main__":
 #执行添加主机 or Item or Trigger函数，不需要使用的函数请注释掉
-#  createHost()
-#  createItem() 
+  createHost()
+  createItem() 
   createTrigger()
