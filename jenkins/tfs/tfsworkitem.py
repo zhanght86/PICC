@@ -74,6 +74,12 @@ else:
     #getMergeCandidate
     versioncontrolclient = tpc.getVersionControlClient()
     mergeCandidates = versioncontrolclient.getMergeCandidates(source,target,RecursionType.FULL,MergeFlags.BASELESS)
+    if mergeCandidates:
+        for m_candidate in mergeCandidates:
+           print m_candidate.getChangeset().getChangesetID()
+    else:
+        raise Exception("There is no merge candidates!")
+        
     #判断未合并变更集列表关联的工作项中是否有输入的workitem ID，如果有，则提取变更集列表changesets
     changesets = []
     for i in mergeCandidates:
@@ -143,33 +149,31 @@ else:
                     tpc.close()
                     raise Exception("There is a checkin conflict,Please merge it manually！")
 tpc.close()
-	
+
 
 '''
 #一个ID的下所有的变更集合并完成后开始签入
-#关联工作项ID 	
+#关联工作项ID 
 workitemcheckininfos = [WorkItemCheckinInfo(workitem),]
 pendingchanges = workspace.getPendingChanges().getPendingChanges()
 print "合并项为："
 print pendingchanges[0].getLocalItem()
 try:
-	workspace.checkIn(pendingchanges,i.getComment(),None,workitemcheckininfos,None)
-	tpc.close()
+        workspace.checkIn(pendingchanges,i.getComment(),None,workitemcheckininfos,None)
+        tpc.close()
 except CheckinException as e:
-	print "There is a checkin conflict!"
-	sys.exit()
+        print "There is a checkin conflict!"
+        sys.exit()
 
 
 #判断未合并变更集列表的注释中是否有输入的workitemid，如果有，则提取出changeset list
 for i in mergeCandidates:
-	comment = i.getChangeset().getComment()
-	changesetid = i.getChangeset().getChangesetID()
-	print  changesetid,": ",comment
-	
-	rem_no = comment[4:comment.find('#')]
-	if rem_no == ID:
-		changesets.append(i.getChangeset())
+        comment = i.getChangeset().getComment()
+        changesetid = i.getChangeset().getChangesetID()
+        print  changesetid,": ",comment
+
+        rem_no = comment[4:comment.find('#')]
+        if rem_no == ID:
+                changesets.append(i.getChangeset())
 
 '''
-	
-		
